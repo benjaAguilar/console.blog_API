@@ -1,27 +1,30 @@
 import prisma from "./prismaClient.js";
+import { tryQuery } from "../lib/tryCatch.js";
 
-async function registerUser(username, password){
-    await prisma.user.create({
-        data: {
-            username: username,
-            password: password
-        }
-    })
+const registerUser = async (username, password) => {
+    return await tryQuery(() =>
+        prisma.user.create({
+            data: {
+                username: username,
+                password: password
+            }
+        })
+    );
 }
 
-async function getUserByName(username){
-    const user = await prisma.user.findUnique({
-        where: {
-            username: username
-        }
-    });
-
-    return user;
+const getUserByName = async (username) => {
+    return await tryQuery(() =>
+        prisma.user.findUnique({
+            where: {
+                username: username
+            }
+        })
+    );
 }
 
 const userQueries = {
     registerUser,
-    getUserByName
+    getUserByName,
 }
 
 export default userQueries;

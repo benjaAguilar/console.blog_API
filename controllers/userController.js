@@ -3,17 +3,18 @@ import validator from '../config/validator.js';
 import bcrypt from 'bcryptjs';
 import userQueries from '../db/userQueries.js';
 import { createJWT } from '../lib/utils.js';
+import tryCatch from '../lib/tryCatch.js';
+import Errors from '../lib/customError.js';
 
 const registerUser = [
     validator.validateRegister,
+    tryCatch(
     async (req, res, next) => {
         const validationErrors = validationResult(req);
         if(!validationErrors.isEmpty()){
-            res.status(400).json({
-                status: 400,
-                errorMessages: validationErrors.array()
-            });
-            return;
+            return next(
+                new Errors.validationError('Invalid fields', 400, validationErrors.array())
+            );
         }
 
         const { username, password } = req.body;
@@ -31,42 +32,43 @@ const registerUser = [
             await userQueries.registerUser(username, hashedPassword);
             //responder con json
             res.json({
+                success: true,
                 message: 'User Created successfully'
             })
         })
-    }    
+    })    
 ]
 
 // CREAR LOGIN DE USUARIO y generar TOKEN
 const loginUser = [
     validator.validateLogin,
+    tryCatch(
     async (req, res, next) => {
         const validationErrors = validationResult(req);
         if(!validationErrors.isEmpty()){
-            res.status(400).json({
-                status: 400,
-                errorMessages: validationErrors.array()
-            });
-            return;
+            return next(
+                new Errors.validationError('Invalid fields', 400, validationErrors.array())
+            );
         }
 
         const { username, password } = req.body;
         const user = await userQueries.getUserByName(username);
 
-        if(!user) return res.status(404).json({status: 404, message: 'User not Found'});
+        if(!user) return next(new Errors.customError('User not Found', 404));
 
         const match = await bcrypt.compare(password, user.password);
 
-        if(!match) return res.status(400).json({status: 400, message: 'Incorrect password'});
+        if(!match) return next(new Errors.customError('Incorrect Password', 400));
 
         const tokenObject = createJWT(user);
 
         res.json({
             success: true,
             token: tokenObject.token,
-            expires: tokenObject.expires
+            expires: tokenObject.expires,
+            message: `Successfully logged in as ${username}`
         })
-    }
+    })
 ]
 
 const userController = {

@@ -10,11 +10,19 @@ const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: process.env.SECRET_JWT,
     algorithms: ["HS256"],
+    jsonWebTokenOptions: {
+      maxAge: '30s'
+    }
 }
 
 const configurePassport = (passport) => {
     passport.use(
       new jwtStrategy(jwtOptions, (payload, done) => {
+        const currentTime = Math.floor(Date.now() / 1000);
+        if (payload.exp < currentTime) {
+          return done(null, false, { message: "Token expired" });
+        }
+
         prisma.user
           .findUnique({
             where: {

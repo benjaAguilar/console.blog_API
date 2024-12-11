@@ -9,8 +9,19 @@ async function registerUser(username, password){
     })
 }
 
+async function getUserByName(username){
+    const user = await prisma.user.findUnique({
+        where: {
+            username: username
+        }
+    });
+
+    return user;
+}
+
 const userQueries = {
-    registerUser
+    registerUser,
+    getUserByName
 }
 
 export default userQueries;

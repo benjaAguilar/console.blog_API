@@ -25,9 +25,20 @@ const getPosts = async () => {
     );
 }
 
+const getPostById = async (postId) => {
+    return tryQuery(() =>
+        prisma.post.findUnique({
+            where: {
+                id: postId
+            }
+        })
+    );
+}
+
 const postQueries = {
     createPost,
-    getPosts
+    getPosts,
+    getPostById
 }
 
 export default postQueries;

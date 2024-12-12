@@ -5,7 +5,13 @@ import postQueries from "../db/postQueries.js";
 import Errors from "../lib/customError.js";
 
 async function getPosts(req, res, next){
-    res.json({cheers: 'Hello to posts API'});
+    
+    const posts = await postQueries.getPosts();
+
+    res.json({
+        success: true,
+        posts        
+    });
 }
 
 async function createPost(req, res, next){

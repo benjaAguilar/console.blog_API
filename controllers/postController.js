@@ -42,7 +42,7 @@ async function createPost(req, res, next){
 
     const { title } = req.body;
     //guardar datos en la DB
-    const post = await postQueries.createPost(title, result.secure_url, user.id, readTime);
+    const post = await postQueries.createPost(title, result.secure_url, result.public_id, user.id, readTime);
 
     res.json({
         success: true,

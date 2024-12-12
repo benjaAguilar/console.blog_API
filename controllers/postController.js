@@ -1,8 +1,8 @@
-import { calculateReadTime, saveMD } from "../lib/utils.js";
+import { calculateReadTime, deleteLocalUploads, saveMD } from "../lib/utils.js";
 import { v2 as cloudinary } from "cloudinary";
-import fs from 'node:fs';
 import postQueries from "../db/postQueries.js";
 import Errors from "../lib/customError.js";
+import { uploadMDtoCloud } from "../lib/cloudinary.js";
 
 async function getPosts(req, res, next){
     
@@ -24,26 +24,18 @@ async function createPost(req, res, next){
     const file = req.file;
     const path = saveMD(file);
 
-    //subir md a clodinary y obtener su secure url
-    const result = await cloudinary.uploader.upload(path, {
-        folder: 'Console.Blog',
-        resource_type: 'raw'
-    });
-    
-    // TODO MANEJAR ERROR SI FALLA LA SUBIDA A CLOUDINARY
+    if(file.mimetype !== 'text/markdown'){
+        deleteLocalUploads(path);
+        return next(new Errors.customError('File provided has to be a markdown', 400));
+    }
 
     // obtener el readtime
     const readTime = await calculateReadTime(path);
 
-    //una vez subido se puede eliminar de uploads
-    fs.unlink(path, (err) => {
-        if(err){
-            console.error('Error deleting files on FS');
-        }
-    });
+    //subir md a clodinary y obtener su secure url
+    const result = await uploadMDtoCloud(path, {folder: 'Console.Blog', resource_type: 'raw'});
 
     const { title } = req.body;
-    //guardar datos en la DB
     const post = await postQueries.createPost(title, result.secure_url, result.public_id, user.id, readTime);
 
     res.json({

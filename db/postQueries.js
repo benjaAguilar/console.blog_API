@@ -14,8 +14,19 @@ const createPost = async (title, cloudUrl, ownerId, readtime) => {
     )   
 }
 
+const getPosts = async () => {
+    return tryQuery(() =>
+        prisma.post.findMany({
+            include: {
+                owner: true
+            }
+        })
+    );
+}
+
 const postQueries = {
-    createPost
+    createPost,
+    getPosts
 }
 
 export default postQueries;

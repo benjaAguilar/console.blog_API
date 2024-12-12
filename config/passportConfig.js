@@ -11,7 +11,7 @@ const jwtOptions = {
     secretOrKey: process.env.SECRET_JWT,
     algorithms: ["HS256"],
     jsonWebTokenOptions: {
-      maxAge: '30s'
+      maxAge: '1d'
     }
 }
 

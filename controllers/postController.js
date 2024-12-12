@@ -29,6 +29,8 @@ async function createPost(req, res, next){
         folder: 'Console.Blog',
         resource_type: 'raw'
     });
+    
+    // TODO MANEJAR ERROR SI FALLA LA SUBIDA A CLOUDINARY
 
     // obtener el readtime
     const readTime = await calculateReadTime(path);
@@ -51,9 +53,40 @@ async function createPost(req, res, next){
     });
 }
 
+async function deletePost(req, res, next){
+    const user = req.user;
+    if(user.role !== "ADMIN") {
+        next(new Errors.customError('You dont have permissions to delete a post', 401));
+    }
+
+    const postId = parseInt(req.params.postId);
+
+    // obtener la data del post a eliminar 
+    const post = await postQueries.getPostById(postId);
+
+    if(!post) return next(new Errors.customError('Post not found', 404));
+
+    // eliminar archivo alojado en cloudinary
+    const result = await cloudinary.uploader.destroy(post.cloudId, {resource_type: 'raw'});
+
+    // TODO manejar error en caso de que falle la eliminacion del file
+
+    console.log('CLOUD RESULT! -----------');
+    console.log(result);
+
+    // eliminar registro de la DB
+    await postQueries.deletePost(postId);
+
+    res.json({
+        success: true,
+        message: `Post: ${post.title} successfully deleted!`
+    })
+}
+
 const postController = {
     getPosts,
-    createPost
+    createPost,
+    deletePost
 }
 
 export default postController;

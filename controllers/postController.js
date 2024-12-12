@@ -2,7 +2,7 @@ import { calculateReadTime, deleteLocalUploads, saveMD } from "../lib/utils.js";
 import { v2 as cloudinary } from "cloudinary";
 import postQueries from "../db/postQueries.js";
 import Errors from "../lib/customError.js";
-import { uploadMDtoCloud } from "../lib/cloudinary.js";
+import { deleteMDfromCloud, uploadMDtoCloud } from "../lib/cloudinary.js";
 
 async function getPosts(req, res, next){
     
@@ -17,7 +17,7 @@ async function getPosts(req, res, next){
 async function createPost(req, res, next){
     const user = req.user;
     if(user.role !== "ADMIN") {
-        next(new Errors.customError('You dont have permissions to create a post', 401));
+        return next(new Errors.customError('You dont have permissions to create a post', 401));
     } 
 
     //obtener el markdown y guardarlo con su nombre
@@ -48,7 +48,7 @@ async function createPost(req, res, next){
 async function deletePost(req, res, next){
     const user = req.user;
     if(user.role !== "ADMIN") {
-        next(new Errors.customError('You dont have permissions to delete a post', 401));
+        return next(new Errors.customError('You dont have permissions to delete a post', 401));
     }
 
     const postId = parseInt(req.params.postId);
@@ -59,12 +59,7 @@ async function deletePost(req, res, next){
     if(!post) return next(new Errors.customError('Post not found', 404));
 
     // eliminar archivo alojado en cloudinary
-    const result = await cloudinary.uploader.destroy(post.cloudId, {resource_type: 'raw'});
-
-    // TODO manejar error en caso de que falle la eliminacion del file
-
-    console.log('CLOUD RESULT! -----------');
-    console.log(result);
+    await deleteMDfromCloud(post.cloudId, {resource_type: 'raw'});
 
     // eliminar registro de la DB
     await postQueries.deletePost(postId);

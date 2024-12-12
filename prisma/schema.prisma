@@ -17,6 +17,7 @@ model Post {
   id          Int       @id @default(autoincrement())
   title       String
   contentUrl  String
+  cloudId     String
   owner       User      @relation(fields: [ownerId], references: [id])
   ownerId     Int
   comments    Comment[] @relation("PostComments")

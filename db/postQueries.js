@@ -35,10 +35,21 @@ const getPostById = async (postId) => {
     );
 }
 
+const deletePost = async (postId) => {
+    return tryQuery(() => 
+        prisma.post.delete({
+            where: {
+                id: postId
+            }
+        })
+    );
+}
+
 const postQueries = {
     createPost,
     getPosts,
-    getPostById
+    getPostById,
+    deletePost
 }
 
 export default postQueries;

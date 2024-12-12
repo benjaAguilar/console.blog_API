@@ -1,5 +1,4 @@
 import { calculateReadTime, deleteLocalUploads, saveMD } from "../lib/utils.js";
-import { v2 as cloudinary } from "cloudinary";
 import postQueries from "../db/postQueries.js";
 import Errors from "../lib/customError.js";
 import { deleteMDfromCloud, uploadMDtoCloud } from "../lib/cloudinary.js";

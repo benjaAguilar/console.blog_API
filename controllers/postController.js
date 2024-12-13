@@ -44,6 +44,43 @@ async function createPost(req, res, next){
     });
 }
 
+async function updatePost(req, res, next){
+    const user = req.user;
+    if(user.role !== "ADMIN") {
+        return next(new Errors.customError('You dont have permissions to update a post', 401));
+    }
+
+    const postId = parseInt(req.params.postId);
+
+    const post = await postQueries.getPostById(postId);
+    if(!post) return next(new Errors.customError('Post not found', 404));
+
+    const file = req.file;
+    const path = saveMD(file);
+
+    if(file.mimetype !== 'text/markdown'){
+        deleteLocalUploads(path);
+        return next(new Errors.customError('File provided has to be a markdown', 400));
+    }
+
+    const readTime = await calculateReadTime(path);
+
+    // subir post nuevo a cloudinary
+    const result = await uploadMDtoCloud(path, {folder: 'Console.Blog', resource_type: 'raw'});
+
+    // update en la DB
+    const { title } = req.body;
+    await postQueries.updatePost(post.id, title, result.public_id, result.secure_url, readTime)
+
+    // eliminar archivo perdido en cloudinary
+    await deleteMDfromCloud(post.cloudId, {resource_type: 'raw'});
+
+    res.json({
+        success: true,
+        message: `Post ${title} Successfully updated!`
+    });
+}
+
 async function deletePost(req, res, next){
     const user = req.user;
     if(user.role !== "ADMIN") {
@@ -66,13 +103,14 @@ async function deletePost(req, res, next){
     res.json({
         success: true,
         message: `Post: ${post.title} successfully deleted!`
-    })
+    });
 }
 
 const postController = {
     getPosts,
     createPost,
-    deletePost
+    deletePost,
+    updatePost
 }
 
 export default postController;

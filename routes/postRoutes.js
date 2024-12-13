@@ -21,5 +21,12 @@ router.delete(
     tryCatch(postController.deletePost)
 );
 
+router.put(
+    '/:postId',
+    passport.authenticate('jwt', {session: false}),
+    upload.single('post'),
+    tryCatch(postController.updatePost)
+)
+
 export default router;
 

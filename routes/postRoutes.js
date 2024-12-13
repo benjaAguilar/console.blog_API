@@ -6,7 +6,9 @@ import passport from "passport";
 
 const router = Router();
 
-router.get('/', postController.getPosts);
+router.get('/', tryCatch(postController.getPosts));
+
+router.get('/:postId', tryCatch(postController.getSinglePost));
 
 router.post(
     '/', 
@@ -26,7 +28,7 @@ router.put(
     passport.authenticate('jwt', {session: false}),
     upload.single('post'),
     tryCatch(postController.updatePost)
-)
+);
 
 export default router;
 

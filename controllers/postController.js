@@ -13,6 +13,17 @@ async function getPosts(req, res, next){
     });
 }
 
+async function getSinglePost(req, res, next){
+    const postId = parseInt(req.params.postId);
+
+    const post = await postQueries.getPostById(postId);
+
+    res.json({
+        success: true,
+        post
+    });
+}
+
 async function createPost(req, res, next){
     const user = req.user;
     if(user.role !== "ADMIN") {
@@ -110,7 +121,8 @@ const postController = {
     getPosts,
     createPost,
     deletePost,
-    updatePost
+    updatePost,
+    getSinglePost
 }
 
 export default postController;

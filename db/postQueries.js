@@ -19,7 +19,8 @@ const getPosts = async () => {
     return tryQuery(() =>
         prisma.post.findMany({
             include: {
-                owner: true
+                owner: true,
+                comments: true
             }
         })
     );

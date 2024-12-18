@@ -45,6 +45,10 @@ const createPost = [
         
             //obtener el markdown y guardarlo con su nombre
             const file = req.file;
+            if(!file) {
+                return next(new Errors.customError('File not provided', 400));
+            }
+
             const path = saveMD(file);
         
             if(file.mimetype !== 'text/markdown'){
@@ -92,6 +96,10 @@ const updatePost = [
             if(!post) return next(new Errors.customError('Post not found', 404));
         
             const file = req.file;
+            if(!file) {
+                return next(new Errors.customError('File not provided', 400));
+            }
+            
             const path = saveMD(file);
         
             if(file.mimetype !== 'text/markdown'){

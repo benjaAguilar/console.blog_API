@@ -1,4 +1,5 @@
 import commentQueries from "../db/commentQueries.js";
+import { validationResult } from 'express-validator';
 import validator from "../config/validator.js";
 import Errors from "../lib/customError.js";
 import tryCatch from "../lib/tryCatch.js";

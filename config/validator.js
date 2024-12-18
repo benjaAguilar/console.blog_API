@@ -39,9 +39,15 @@ const validateLogin = [
     .notEmpty().withMessage('Password is required')
 ]
 
+const validateComment = [
+    body('content').trim()
+    .notEmpty().withMessage('Comment cannot be empty')
+]
+
 const validator = {
     validateRegister,
-    validateLogin
+    validateLogin,
+    validateComment
 }
 
 export default validator;

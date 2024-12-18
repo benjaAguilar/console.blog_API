@@ -35,7 +35,7 @@ async function deleteComment(req, res, next){
         return next(new Errors.customError('Comment not found', 404));
     }
 
-    if(comment.ownerId !== user.id || user.role !== 'ADMIN'){
+    if(comment.ownerId !== user.id && user.role !== 'ADMIN'){
         return next(new Errors.customError('You dont have permissions to delete this comment', 401));
     }
 

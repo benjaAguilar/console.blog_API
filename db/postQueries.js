@@ -62,12 +62,28 @@ const updatePost = async (postId, title, cloudId, contentUrl, readTime) => {
     );
 }
 
+const updatePostViews = async (postId) => {
+    return tryQuery(() => 
+        prisma.post.update({
+            data: {
+                views: {
+                    increment: 1
+                }
+            },
+            where: {
+                id: postId
+            }
+        })
+    )
+}
+
 const postQueries = {
     createPost,
     getPosts,
     getPostById,
     deletePost,
-    updatePost
+    updatePost,
+    updatePostViews
 }
 
 export default postQueries;

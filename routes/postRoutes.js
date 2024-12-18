@@ -15,7 +15,7 @@ router.post(
     '/', 
     passport.authenticate('jwt', {session: false}), 
     upload.single('post'), 
-    tryCatch(postController.createPost)
+    postController.createPost
 );
 
 router.delete(
@@ -28,7 +28,7 @@ router.put(
     '/:postId',
     passport.authenticate('jwt', {session: false}),
     upload.single('post'),
-    tryCatch(postController.updatePost)
+    postController.updatePost
 );
 
 //COMMENTS

@@ -43,11 +43,25 @@ const deleteComment = async (commentId) => {
     );
 }
 
+const updateComment = async (commentId, content) => {
+    return tryQuery(() => 
+        prisma.comment.update({
+            data: {
+                content: content
+            },
+            where: {
+                id: commentId
+            }
+        })
+    );
+}
+
 const commentQueries = {
     createComment,
     getComments,
     getCommentById,
-    deleteComment
+    deleteComment,
+    updateComment
 }
 
 export default commentQueries;

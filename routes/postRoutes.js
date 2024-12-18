@@ -40,7 +40,7 @@ router.get(
 router.post(
      '/:postId/comments',
      passport.authenticate('jwt', {session: false}),
-     tryCatch(commentController.createComment)
+     commentController.createComment
 );
 
 router.delete(
@@ -52,7 +52,7 @@ router.delete(
 router.put(
     '/comments/:commentId',
     passport.authenticate('jwt', {session: false}),
-    tryCatch(commentController.updateComment)
+    commentController.updateComment
 );
 
 export default router;

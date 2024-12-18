@@ -44,10 +44,17 @@ const validateComment = [
     .notEmpty().withMessage('Comment cannot be empty')
 ]
 
+const validatePostTitle = [
+    body('title').trim()
+    .notEmpty().withMessage('Title cannot be empty')
+    .isLength({min: 4, max: 30}).withMessage('Title has to be at least 4 characters and a maximum of 30 characters')
+]
+
 const validator = {
     validateRegister,
     validateLogin,
-    validateComment
+    validateComment,
+    validatePostTitle
 }
 
 export default validator;

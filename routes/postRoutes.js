@@ -49,5 +49,11 @@ router.delete(
     tryCatch(commentController.deleteComment)
 );
 
+router.put(
+    '/comments/:commentId',
+    passport.authenticate('jwt', {session: false}),
+    tryCatch(commentController.updateComment)
+);
+
 export default router;
 

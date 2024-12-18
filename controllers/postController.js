@@ -20,6 +20,11 @@ async function getSinglePost(req, res, next){
     const postId = parseInt(req.params.postId);
 
     const post = await postQueries.getPostById(postId);
+    if(!post){
+        return next(new Errors.customError('Post not found', 404));
+    }
+    
+    await postQueries.updatePostViews(postId);
 
     res.json({
         success: true,

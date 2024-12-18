@@ -48,10 +48,35 @@ async function deleteComment(req, res, next){
     });
 }
 
+async function updateComment(req, res, next){
+    const user = req.user;
+    const commentId = parseInt(req.params.commentId);
+
+    const comment = await commentQueries.getCommentById(commentId);
+
+    if(!comment){
+        return next(new Errors.customError('Comment not found', 404));
+    }
+
+    if(comment.ownerId !== user.id){
+        return next(new Errors.customError('You dont have permissions to edit this comment', 401));
+    }
+
+    const { content } = req.body;
+    const updatedComment = await commentQueries.updateComment(commentId, content);
+
+    res.json({
+        success: true,
+        message: 'Comment Updated!',
+        updatedComment
+    });
+}
+
 const commentController = {
     getComments,
     createComment,
-    deleteComment
+    deleteComment,
+    updateComment
 }
 
 export default commentController;

@@ -32,7 +32,7 @@ router.put(
 );
 
 router.put(
-    '/like/:postId',
+    '/:postId/like',
     passport.authenticate('jwt', {session: false}),
     tryCatch(postController.updateLikePost)
 );

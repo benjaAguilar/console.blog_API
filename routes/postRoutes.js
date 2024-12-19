@@ -31,6 +31,12 @@ router.put(
     postController.updatePost
 );
 
+router.put(
+    '/like/:postId',
+    passport.authenticate('jwt', {session: false}),
+    tryCatch(postController.updateLikePost)
+);
+
 //COMMENTS
 router.get(
     '/:postId/comments',

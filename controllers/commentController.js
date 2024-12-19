@@ -99,11 +99,42 @@ const updateComment = [
     )
 ]
 
+async function updateLikeComment(req, res, next){
+    let msg = 'Liked!';
+
+    const user = req.user;
+    const commentId = parseInt(req.params.commentId);
+
+    const [ liked, comment ] = await Promise.all([
+        commentQueries.findExistingLike(commentId, user.id),
+        commentQueries.getCommentById(commentId)
+    ]);
+    
+    if(!comment){
+        return next(new Errors.customError('Comment not found', 404));
+    }
+
+    if(!liked) {
+        await commentQueries.like(commentId, user.id);
+
+    } else {
+        await commentQueries.dislike(commentId, user.id);
+        msg = 'Disliked!';
+
+    }
+
+    res.json({
+        success: true,
+        message: msg
+    });
+}
+
 const commentController = {
     getComments,
     createComment,
     deleteComment,
-    updateComment
+    updateComment,
+    updateLikeComment
 }
 
 export default commentController;

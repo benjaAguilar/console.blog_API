@@ -20,7 +20,8 @@ const getPosts = async () => {
         prisma.post.findMany({
             include: {
                 owner: true,
-                comments: true
+                comments: true,
+                userLikes: true,
             }
         })
     );
@@ -77,13 +78,53 @@ const updatePostViews = async (postId) => {
     )
 }
 
+const findExistingLike = async (postId, userId) => {
+    return tryQuery(() =>
+        prisma.postLikes.findUnique({
+            where: {
+                postId_userId: {
+                    postId: postId,
+                    userId: userId
+                }
+            }
+        })
+    );
+}
+
+const like = async (postId, userId) => {
+    return tryQuery(() =>
+        prisma.postLikes.create({
+            data: {
+                post: { connect: { id: postId }},
+                user: { connect: { id: userId }}
+            }
+        })
+    );
+}
+
+const dislike = async (postId, userId) => {
+    return tryQuery(() =>
+        prisma.postLikes.delete({
+            where: {
+                postId_userId: {
+                    postId: postId,
+                    userId: userId
+                }
+            }
+        })
+    );
+}
+
 const postQueries = {
     createPost,
     getPosts,
     getPostById,
     deletePost,
     updatePost,
-    updatePostViews
+    updatePostViews,
+    findExistingLike,
+    like,
+    dislike
 }
 
 export default postQueries;

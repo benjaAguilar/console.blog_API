@@ -61,5 +61,11 @@ router.put(
     commentController.updateComment
 );
 
+router.put(
+    '/comments/:commentId/like',
+    passport.authenticate('jwt', {session: false}),
+    tryCatch(commentController.updateLikeComment)
+)
+
 export default router;
 

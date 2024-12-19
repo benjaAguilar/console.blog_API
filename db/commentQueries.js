@@ -6,6 +6,9 @@ const getComments = async (postId) => {
         prisma.comment.findMany({
             where: {
                 postId: postId
+            },
+            include: {
+                userLikes: true
             }
         })
     );
@@ -56,12 +59,52 @@ const updateComment = async (commentId, content) => {
     );
 }
 
+const findExistingLike = async (commentId, userId) => {
+    return tryQuery(() =>
+        prisma.commentLikes.findUnique({
+            where: {
+                commentId_userId: {
+                    commentId: commentId,
+                    userId: userId
+                }
+            }
+        })
+    );
+}
+
+const like = async (commentId, userId) => {
+    return tryQuery(() =>
+        prisma.commentLikes.create({
+            data: {
+                comment: {connect: { id: commentId }},
+                user: { connect: { id: userId }}
+            }
+        })
+    );
+}
+
+const dislike = async (commentId, userId) => {
+    return tryQuery(() =>
+        prisma.commentLikes.delete({
+            where: {
+                commentId_userId: {
+                    commentId: commentId,
+                    userId: userId
+                }
+            }
+        })
+    );
+}
+
 const commentQueries = {
     createComment,
     getComments,
     getCommentById,
     deleteComment,
-    updateComment
+    updateComment,
+    findExistingLike,
+    like,
+    dislike
 }
 
 export default commentQueries;

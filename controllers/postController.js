@@ -157,12 +157,43 @@ async function deletePost(req, res, next){
     });
 }
 
+async function updateLikePost(req, res, next){
+    let msg = 'Liked!';
+
+    const user = req.user;
+    const postId = parseInt(req.params.postId);
+
+    const [ liked, post ] = await Promise.all([
+        postQueries.findExistingLike(postId, user.id),
+        postQueries.getPostById(postId)
+    ]);
+    
+    if(!post){
+        return next(new Errors.customError('Post not found', 404));
+    }
+
+    if(!liked) {
+        await postQueries.like(postId, user.id);
+
+    } else {
+        await postQueries.dislike(postId, user.id);
+        msg = 'Disliked!';
+
+    }
+
+    res.json({
+        success: true,
+        message: msg
+    });
+}
+
 const postController = {
     getPosts,
     createPost,
     deletePost,
     updatePost,
-    getSinglePost
+    getSinglePost,
+    updateLikePost
 }
 
 export default postController;

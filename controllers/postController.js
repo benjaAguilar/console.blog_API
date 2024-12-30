@@ -170,7 +170,14 @@ async function deletePost(req, res, next){
     if(!post) return next(new Errors.customError('Post not found', 404));
 
     // eliminar archivo alojado en cloudinary
-    await deleteMDfromCloud(post.cloudId, {resource_type: 'raw'});
+    if(post.thumbnailId){
+        await Promise.all([
+            deleteMDfromCloud(post.thumbnailId, {resource_type: 'image'}),
+            deleteMDfromCloud(post.cloudId, {resource_type: 'raw'})
+        ]);
+    } else {
+        await deleteMDfromCloud(post.cloudId, {resource_type: 'raw'});
+    }
 
     // eliminar registro de la DB
     await postQueries.deletePost(postId);

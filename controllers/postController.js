@@ -1,7 +1,7 @@
 import { calculateReadTime, deleteLocalUploads, saveMD } from "../lib/utils.js";
 import postQueries from "../db/postQueries.js";
 import Errors from "../lib/customError.js";
-import { deleteMDfromCloud, uploadMDtoCloud } from "../lib/cloudinary.js";
+import { deleteMDfromCloud, uploadImgtoCloud, uploadMDtoCloud } from "../lib/cloudinary.js";
 import { validationResult } from 'express-validator';
 import validator from "../config/validator.js";
 import tryCatch from "../lib/tryCatch.js";
@@ -49,26 +49,50 @@ const createPost = [
             } 
         
             //obtener el markdown y guardarlo con su nombre
-            const file = req.file;
+            const file = req.files['post'] ? req.files['post'][0] : null;
+            const thumbnailImage = req.files['thumbnail'] ? req.files['thumbnail'][0] : null;
+
             if(!file) {
                 return next(new Errors.customError('File not provided', 400));
             }
 
-            const path = saveMD(file);
+            const filePath = saveMD(file);
+            let thumbnailPath = '/defaultThumbnail.webp';
+
+            if(thumbnailImage){
+                thumbnailPath = saveMD(thumbnailImage);
+                if(!thumbnailImage.mimetype.startsWith('image/')){
+                    deleteLocalUploads(filePath);
+                    if(thumbnailImage) deleteLocalUploads(thumbnailPath);
+                    return next(new Errors.customError('Thumbnail provided has to be an image', 400));
+                }
+            }
         
             if(file.mimetype !== 'text/markdown'){
-                deleteLocalUploads(path);
+                deleteLocalUploads(filePath);
+                if(thumbnailImage) deleteLocalUploads(thumbnailPath);
                 return next(new Errors.customError('File provided has to be a markdown', 400));
             }
         
             // obtener el readtime
-            const readTime = await calculateReadTime(path);
+            const readTime = await calculateReadTime(filePath);
         
             //subir md a clodinary y obtener su secure url
-            const result = await uploadMDtoCloud(path, {folder: 'Console.Blog', resource_type: 'raw'});
+            const [ fileResult, thumbnailResult ] = await Promise.all([
+                uploadMDtoCloud(filePath, {folder: 'Console.Blog', resource_type: 'raw'}),
+                uploadImgtoCloud(thumbnailPath, {folder: 'Console.Blog', resource_type: 'image'})
+            ]);
         
             const { title } = req.body;
-            const post = await postQueries.createPost(title, result.secure_url, result.public_id, user.id, readTime);
+            const post = await postQueries.createPost(
+                title,
+                fileResult.secure_url, 
+                fileResult.public_id,
+                thumbnailResult.secure_url,
+                thumbnailResult.public_id,
+                user.id,
+                readTime
+            );
         
             res.json({
                 success: true,

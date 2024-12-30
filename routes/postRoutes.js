@@ -14,7 +14,10 @@ router.get('/:postId', tryCatch(postController.getSinglePost));
 router.post(
     '/', 
     passport.authenticate('jwt', {session: false}), 
-    upload.single('post'), 
+    upload.fields([
+        { name: 'post', maxCount: 1 },
+        { name: 'thumbnail', maxCount: 1 }
+    ]), 
     postController.createPost
 );
 

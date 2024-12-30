@@ -14,18 +14,20 @@ datasource db {
 }
 
 model Post {
-  id          Int         @id @default(autoincrement())
-  title       String
-  contentUrl  String
-  cloudId     String
-  owner       User        @relation(fields: [ownerId], references: [id])
-  ownerId     Int
-  comments    Comment[]   @relation("PostComments")
-  createdAt   DateTime    @default(now())
-  views       Int         @default(0)
-  userLikes   postLikes[]
-  readtimeMin Int
-  published   Boolean     @default(false)
+  id           Int         @id @default(autoincrement())
+  title        String
+  contentUrl   String
+  cloudId      String
+  thumbnailUrl String      @default("/defaultThumbnail.webp")
+  thumbnailId  String?
+  owner        User        @relation(fields: [ownerId], references: [id])
+  ownerId      Int
+  comments     Comment[]   @relation("PostComments")
+  createdAt    DateTime    @default(now())
+  views        Int         @default(0)
+  userLikes    postLikes[]
+  readtimeMin  Int
+  published    Boolean     @default(false)
 }
 
 model User {

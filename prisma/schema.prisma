@@ -48,13 +48,13 @@ model Comment {
   userLikes  commentLikes[]
   owner      User           @relation("UserComments", fields: [ownerId], references: [id])
   ownerId    Int
-  parentPost Post           @relation("PostComments", fields: [postId], references: [id])
+  parentPost Post           @relation("PostComments", fields: [postId], references: [id], onDelete: Cascade)
   postId     Int
   createdAt  DateTime       @default(now())
 }
 
 model postLikes {
-  post    Post     @relation(fields: [postId], references: [id])
+  post    Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId  Int
   user    User     @relation(fields: [userId], references: [id])
   userId  Int
@@ -64,7 +64,7 @@ model postLikes {
 }
 
 model commentLikes {
-  comment   Comment  @relation(fields: [commentId], references: [id])
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
   commentId Int
   user      User     @relation(fields: [userId], references: [id])
   userId    Int

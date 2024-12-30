@@ -1,13 +1,15 @@
 import prisma from "./prismaClient.js";
 import { tryQuery } from "../lib/tryCatch.js";
 
-const createPost = async (title, cloudUrl, cloudId, ownerId, readtime) => {
+const createPost = async (title, cloudUrl, cloudId, thumbnailUrl, thumbnailId, ownerId, readtime) => {
     return tryQuery(() => 
         prisma.post.create({
             data: {
                 title: title,
                 contentUrl: cloudUrl,
                 cloudId: cloudId,
+                thumbnailUrl: thumbnailUrl,
+                thumbnailId: thumbnailId,
                 ownerId: ownerId,
                 readtimeMin: readtime
             }

@@ -49,13 +49,15 @@ const deletePost = async (postId) => {
     );
 }
 
-const updatePost = async (postId, title, cloudId, contentUrl, readTime) => {
+const updatePost = async (postId, title, cloudId, contentUrl, thumbnailId, thumbnailUrl, readTime) => {
     return tryQuery(() => 
         prisma.post.update({
             data: {
                 title: title,
                 cloudId: cloudId,
                 contentUrl: contentUrl,
+                thumbnailId: thumbnailId,
+                thumbnailUrl: thumbnailUrl,
                 readtimeMin: readTime
             },
             where: {

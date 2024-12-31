@@ -30,7 +30,10 @@ router.delete(
 router.put(
     '/:postId',
     passport.authenticate('jwt', {session: false}),
-    upload.single('post'),
+    upload.fields([
+        { name: 'post', maxCount: 1 },
+        { name: 'thumbnail', maxCount: 1 }
+    ]), 
     postController.updatePost
 );
 

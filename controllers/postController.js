@@ -124,29 +124,59 @@ const updatePost = [
             const post = await postQueries.getPostById(postId);
             if(!post) return next(new Errors.customError('Post not found', 404));
         
-            const file = req.file;
+            const file = req.files['post'] ? req.files['post'][0] : null;
+            const thumbnailImage = req.files['thumbnail'] ? req.files['thumbnail'][0] : null;
+
             if(!file) {
                 return next(new Errors.customError('File not provided', 400));
             }
             
-            const path = saveMD(file);
+            const filePath = saveMD(file);
+            let thumbnailPath = post.thumbnailUrl;
+            
+            if(thumbnailImage){
+                thumbnailPath = saveMD(thumbnailImage);
+                if(!thumbnailImage.mimetype.startsWith('image/')){
+                    deleteLocalUploads(filePath);
+                    if(thumbnailImage) deleteLocalUploads(thumbnailPath);
+                    return next(new Errors.customError('Thumbnail provided has to be an image', 400));
+                }
+            }
         
             if(file.mimetype !== 'text/markdown'){
-                deleteLocalUploads(path);
+                deleteLocalUploads(filePath);
                 return next(new Errors.customError('File provided has to be a markdown', 400));
             }
         
-            const readTime = await calculateReadTime(path);
+            const readTime = await calculateReadTime(filePath);
         
             // subir post nuevo a cloudinary
-            const result = await uploadMDtoCloud(path, {folder: 'Console.Blog', resource_type: 'raw'});
+            const [ fileResult, thumbnailResult ] = await Promise.all([
+                uploadMDtoCloud(filePath, {folder: 'Console.Blog', resource_type: 'raw'}),
+                uploadImgtoCloud(thumbnailPath, {folder: 'Console.Blog', resource_type: 'image'}, { path: post.thumbnailUrl, id: post.thumbnailId })
+            ]);
         
             // update en la DB
             const { title } = req.body;
-            await postQueries.updatePost(post.id, title, result.public_id, result.secure_url, readTime)
+            await postQueries.updatePost(
+                post.id, 
+                title, 
+                fileResult.public_id, 
+                fileResult.secure_url, 
+                thumbnailResult.public_id, 
+                thumbnailResult.secure_url,
+                readTime
+            )
         
             // eliminar archivo perdido en cloudinary
-            await deleteMDfromCloud(post.cloudId, {resource_type: 'raw'});
+            if(thumbnailResult.public_id !== post.thumbnailId && thumbnailResult.public_id && post.thumbnailId){
+                await Promise.all([
+                    deleteMDfromCloud(post.thumbnailId, {resource_type: 'image'}),
+                    deleteMDfromCloud(post.cloudId, {resource_type: 'raw'})
+                ]);
+            } else {
+                await deleteMDfromCloud(post.cloudId, {resource_type: 'raw'});
+            }
         
             res.json({
                 success: true,

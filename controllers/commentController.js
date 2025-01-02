@@ -1,4 +1,5 @@
 import commentQueries from "../db/commentQueries.js";
+import postQueries from "../db/postQueries.js";
 import { validationResult } from "express-validator";
 import validator from "../config/validator.js";
 import Errors from "../lib/customError.js";
@@ -30,6 +31,12 @@ const createComment = [
 
     const user = req.user;
     const postId = parseInt(req.params.postId);
+
+    const post = await postQueries.getPostById(postId);
+
+    if (!post) {
+      return next(new Errors.customError("Post not found", 404));
+    }
 
     const { content } = req.body;
     const comment = await commentQueries.createComment(

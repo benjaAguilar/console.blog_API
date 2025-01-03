@@ -167,6 +167,36 @@ const createCategory = async (name) => {
   );
 };
 
+const deleteCategoriesRelations = async (postId, categories) => {
+  return tryQuery(() =>
+    prisma.postCategory.deleteMany({
+      where: {
+        postId: postId,
+        categoryId: {
+          notIn: categories,
+        },
+      },
+    }),
+  );
+};
+
+const addNewCategoriesRelations = async (postId, categories) => {
+  return tryQuery(
+    async () =>
+      await Promise.all(
+        categories.map((categoryId) =>
+          prisma.postCategory.upsert({
+            where: {
+              postId_categoryId: { postId, categoryId }, // Composite key
+            },
+            update: {}, // No se necesita actualizar nada si ya existe
+            create: { postId, categoryId }, // Crea la relación si no existe
+          }),
+        ),
+      ),
+  );
+};
+
 const postQueries = {
   createPost,
   getPosts,
@@ -179,6 +209,8 @@ const postQueries = {
   dislike,
   getCategories,
   createCategory,
+  deleteCategoriesRelations,
+  addNewCategoriesRelations,
 };
 
 export default postQueries;

@@ -109,7 +109,7 @@ const createPost = [
     const { title } = req.body;
     let categoryNames = req.body.categoryNames;
 
-    if (!categoryNames) {
+    if (!categoryNames || categoryNames === "") {
       categoryNames = ["other"];
     } else {
       categoryNames = categoryNames.split(" ");
@@ -222,6 +222,26 @@ const updatePost = [
 
     // update en la DB
     const { title } = req.body;
+    let categoryNames = req.body.categoryNames;
+
+    if (!categoryNames || categoryNames === "") {
+      categoryNames = ["other"];
+    } else {
+      categoryNames = categoryNames.split(" ");
+    }
+
+    //get categories
+    const categories = await Promise.all(
+      categoryNames.map(async (name) => {
+        const lowerCaseName = name.toLowerCase();
+        let category = await postQueries.getCategories(lowerCaseName);
+        if (!category) {
+          category = await postQueries.createCategory(lowerCaseName);
+        }
+        return category.id;
+      }),
+    );
+
     await postQueries.updatePost(
       post.id,
       title,
@@ -231,6 +251,8 @@ const updatePost = [
       thumbnailResult.secure_url,
       readTime,
     );
+    await postQueries.deleteCategoriesRelations(post.id, categories);
+    await postQueries.addNewCategoriesRelations(postId, categories);
 
     // eliminar archivo perdido en cloudinary
     if (

@@ -135,6 +135,26 @@ const dislike = async (postId, userId) => {
   );
 };
 
+const getCategories = async (name) => {
+  return tryQuery(() =>
+    prisma.category.findFirst({
+      where: {
+        name: name,
+      },
+    }),
+  );
+};
+
+const createCategory = async (name) => {
+  return tryQuery(() =>
+    prisma.category.create({
+      data: {
+        name: name,
+      },
+    }),
+  );
+};
+
 const postQueries = {
   createPost,
   getPosts,
@@ -145,6 +165,8 @@ const postQueries = {
   findExistingLike,
   like,
   dislike,
+  getCategories,
+  createCategory,
 };
 
 export default postQueries;

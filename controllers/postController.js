@@ -107,6 +107,26 @@ const createPost = [
     ]);
 
     const { title } = req.body;
+    let categoryNames = req.body.categoryNames;
+
+    if (!categoryNames) {
+      categoryNames = ["other"];
+    } else {
+      categoryNames = categoryNames.split(" ");
+    }
+
+    //get categories
+    const categories = await Promise.all(
+      categoryNames.map(async (name) => {
+        const lowerCaseName = name.toLowerCase();
+        let category = await postQueries.getCategories(lowerCaseName);
+        if (!category) {
+          category = await postQueries.createCategory(lowerCaseName);
+        }
+        return category.id;
+      }),
+    );
+
     const post = await postQueries.createPost(
       title,
       fileResult.secure_url,
@@ -115,6 +135,7 @@ const createPost = [
       thumbnailResult.public_id,
       user.id,
       readTime,
+      categories,
     );
 
     res.json({

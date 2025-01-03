@@ -28,7 +28,7 @@ model Post {
   userLikes    postLikes[]
   readtimeMin  Int
   published    Boolean     @default(false)
-  categories   Category[]  @relation("PostCategories")
+  categories   PostCategory[]
 }
 
 model User {
@@ -77,7 +77,16 @@ model commentLikes {
 model Category {
   id    Int     @id @default(autoincrement())
   name  String  @unique
-  posts Post[]  @relation("PostCategories")
+  posts PostCategory[]
+}
+
+model PostCategory {
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
+  category  Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId Int
+
+  @@id([postId, categoryId])
 }
 
 enum Role {

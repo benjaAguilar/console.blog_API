@@ -28,6 +28,7 @@ model Post {
   userLikes    postLikes[]
   readtimeMin  Int
   published    Boolean     @default(false)
+  categories   Category[]  @relation("PostCategories")
 }
 
 model User {
@@ -71,6 +72,12 @@ model commentLikes {
   likedAt   DateTime @default(now())
 
   @@id([commentId, userId])
+}
+
+model Category {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  posts Post[]  @relation("PostCategories")
 }
 
 enum Role {

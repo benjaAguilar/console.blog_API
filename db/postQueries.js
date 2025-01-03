@@ -9,6 +9,7 @@ const createPost = async (
   thumbnailId,
   ownerId,
   readtime,
+  categories,
 ) => {
   return tryQuery(() =>
     prisma.post.create({
@@ -20,6 +21,9 @@ const createPost = async (
         thumbnailId: thumbnailId,
         ownerId: ownerId,
         readtimeMin: readtime,
+        categories: {
+          create: categories.map((categoryId) => ({ categoryId })),
+        },
       },
     }),
   );
@@ -42,6 +46,14 @@ const getPostById = async (postId) => {
     prisma.post.findUnique({
       where: {
         id: postId,
+      },
+      include: {
+        userLikes: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
       },
     }),
   );

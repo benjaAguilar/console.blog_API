@@ -8,6 +8,7 @@ import errorHandler from "./controllers/errorHandler.js";
 import postRoutes from "./routes/postRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
+import categoryRoutes from "./routes/categoriesRoutes.js";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(passport.initialize());
 app.use("/api/posts", postRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/api/categories", categoryRoutes);
 
 app.use(errorHandler);
 

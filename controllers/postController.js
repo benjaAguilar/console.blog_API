@@ -9,9 +9,22 @@ import {
 import { validationResult } from "express-validator";
 import validator from "../config/validator.js";
 import tryCatch from "../lib/tryCatch.js";
+import categoryQueries from "../db/categoryQueries.js";
 
 async function getPosts(req, res) {
-  const posts = await postQueries.getPosts();
+  const { category } = req.query;
+  let categoryQuery;
+  let posts;
+
+  if (category) {
+    categoryQuery = await categoryQueries.getCategoryByName(category);
+  }
+
+  if (categoryQuery) {
+    posts = await postQueries.getPostsByCategory(categoryQuery.id);
+  } else {
+    posts = await postQueries.getPosts();
+  }
 
   res.json({
     success: true,

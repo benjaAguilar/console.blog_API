@@ -36,6 +36,29 @@ const getPosts = async () => {
         owner: true,
         comments: true,
         userLikes: true,
+        categories: true,
+      },
+    }),
+  );
+};
+
+const getPostsByCategory = async (categoryId) => {
+  return tryQuery(() =>
+    prisma.post.findMany({
+      where: {
+        categories: {
+          some: {
+            categoryId: categoryId,
+          },
+        },
+      },
+      include: {
+        userLikes: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
       },
     }),
   );
@@ -211,6 +234,7 @@ const postQueries = {
   createCategory,
   deleteCategoriesRelations,
   addNewCategoriesRelations,
+  getPostsByCategory,
 };
 
 export default postQueries;

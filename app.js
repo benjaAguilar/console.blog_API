@@ -2,6 +2,7 @@ import express from "express";
 import path from "node:path";
 import passport from "passport";
 import dotenv from "dotenv";
+import cors from "cors";
 import configurePassport from "./config/passportConfig.js";
 import errorHandler from "./controllers/errorHandler.js";
 
@@ -14,6 +15,9 @@ const app = express();
 
 dotenv.config();
 
+const whiteList = ["http://localhost:4321"];
+
+app.use(cors({ origin: whiteList }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(process.cwd(), "public")));

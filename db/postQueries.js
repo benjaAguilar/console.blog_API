@@ -72,6 +72,7 @@ const getPostById = async (postId) => {
       },
       include: {
         userLikes: true,
+        comments: true,
         categories: {
           include: {
             category: true,

@@ -77,9 +77,24 @@ const loginUser = [
   }),
 ];
 
+async function getAuthUser(req, res, next) {
+  const user = req.user;
+
+  if (!user) {
+    return next(new Errors.customError("Register a user", 400));
+  }
+
+  res.json({
+    id: user.id,
+    name: user.name,
+    role: user.role,
+  });
+}
+
 const userController = {
   registerUser,
   loginUser,
+  getAuthUser,
 };
 
 export default userController;

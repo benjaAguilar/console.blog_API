@@ -9,6 +9,7 @@ const getComments = async (postId) => {
       },
       include: {
         userLikes: true,
+        owner: true,
       },
     }),
   );

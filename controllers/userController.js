@@ -68,10 +68,15 @@ const loginUser = [
 
     const tokenObject = createJWT(user);
 
+    res.cookie("authToken", tokenObject.token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
     res.json({
       success: true,
-      token: tokenObject.token,
-      expires: tokenObject.expires,
       message: `Successfully logged in as ${username}`,
     });
   }),

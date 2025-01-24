@@ -10,6 +10,7 @@ import postRoutes from "./routes/postRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 import categoryRoutes from "./routes/categoriesRoutes.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -17,7 +18,8 @@ dotenv.config();
 
 const whiteList = ["http://localhost:4321"];
 
-app.use(cors({ origin: whiteList }));
+app.use(cors({ origin: whiteList, credentials: true }));
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(process.cwd(), "public")));

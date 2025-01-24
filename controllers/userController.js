@@ -86,10 +86,11 @@ async function getAuthUser(req, res, next) {
   const user = req.user;
 
   if (!user) {
-    return next(new Errors.customError("Register a user", 400));
+    return next(new Errors.customError("Register a user", 401));
   }
 
   res.json({
+    success: true,
     id: user.id,
     name: user.name,
     role: user.role,

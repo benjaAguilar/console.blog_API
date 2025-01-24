@@ -1,13 +1,20 @@
 import { Strategy as jwtStrategy } from "passport-jwt";
-import { ExtractJwt } from "passport-jwt";
 import prisma from "../db/prismaClient.js";
 
 import dotenv from "dotenv";
 
 dotenv.config();
 
+function getAuthCookie(req) {
+  let token = null;
+  if (req && req.cookies) {
+    token = req.cookies["authToken"];
+  }
+  return token;
+}
+
 const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  jwtFromRequest: getAuthCookie,
   secretOrKey: process.env.SECRET_JWT,
   algorithms: ["HS256"],
   jsonWebTokenOptions: {

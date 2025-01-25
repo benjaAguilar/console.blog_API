@@ -92,7 +92,7 @@ async function getAuthUser(req, res, next) {
   res.json({
     success: true,
     id: user.id,
-    name: user.name,
+    name: user.username,
     role: user.role,
   });
 }

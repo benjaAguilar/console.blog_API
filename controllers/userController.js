@@ -97,10 +97,26 @@ async function getAuthUser(req, res, next) {
   });
 }
 
+async function logoutUser(req, res, next) {
+  const user = req.user;
+
+  if (!user) {
+    return next(new Errors.customError("Error login out", 401));
+  }
+
+  res.clearCookie("authToken");
+
+  res.json({
+    success: true,
+    message: "Logged out successfully!",
+  });
+}
+
 const userController = {
   registerUser,
   loginUser,
   getAuthUser,
+  logoutUser,
 };
 
 export default userController;

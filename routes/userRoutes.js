@@ -15,4 +15,10 @@ router.get(
   tryCatch(userController.getAuthUser),
 );
 
+router.post(
+  "/logout",
+  passport.authenticate("jwt", { session: false }),
+  tryCatch(userController.logoutUser),
+);
+
 export default router;

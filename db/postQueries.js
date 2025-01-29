@@ -3,6 +3,7 @@ import { tryQuery } from "../lib/tryCatch.js";
 
 const createPost = async (
   title,
+  slug,
   cloudUrl,
   cloudId,
   thumbnailUrl,
@@ -15,6 +16,7 @@ const createPost = async (
     prisma.post.create({
       data: {
         title: title,
+        slug: slug,
         contentUrl: cloudUrl,
         cloudId: cloudId,
         thumbnailUrl: thumbnailUrl,
@@ -83,6 +85,25 @@ const getPostById = async (postId) => {
   );
 };
 
+const getPostBySlug = async (slug) => {
+  return tryQuery(() =>
+    prisma.post.findFirst({
+      where: {
+        slug: slug,
+      },
+      include: {
+        userLikes: true,
+        comments: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+      },
+    }),
+  );
+};
+
 const deletePost = async (postId) => {
   return tryQuery(() =>
     prisma.post.delete({
@@ -96,6 +117,7 @@ const deletePost = async (postId) => {
 const updatePost = async (
   postId,
   title,
+  slug,
   cloudId,
   contentUrl,
   thumbnailId,
@@ -106,6 +128,7 @@ const updatePost = async (
     prisma.post.update({
       data: {
         title: title,
+        slug: slug,
         cloudId: cloudId,
         contentUrl: contentUrl,
         thumbnailId: thumbnailId,
@@ -236,6 +259,7 @@ const postQueries = {
   deleteCategoriesRelations,
   addNewCategoriesRelations,
   getPostsByCategory,
+  getPostBySlug,
 };
 
 export default postQueries;

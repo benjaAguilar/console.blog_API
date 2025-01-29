@@ -15,7 +15,8 @@ datasource db {
 
 model Post {
   id           Int         @id @default(autoincrement())
-  title        String
+  title        String      @unique
+  slug         String      @unique
   contentUrl   String
   cloudId      String
   thumbnailUrl String      @default("/defaultThumbnail.webp")

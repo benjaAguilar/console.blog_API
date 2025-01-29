@@ -10,6 +10,7 @@ import { validationResult } from "express-validator";
 import validator from "../config/validator.js";
 import tryCatch from "../lib/tryCatch.js";
 import categoryQueries from "../db/categoryQueries.js";
+import slugify from "slugify";
 
 async function getPosts(req, res) {
   const { category } = req.query;
@@ -41,6 +42,22 @@ async function getSinglePost(req, res, next) {
   }
 
   await postQueries.updatePostViews(postId);
+
+  res.json({
+    success: true,
+    post,
+  });
+}
+
+async function getPostBySlug(req, res, next) {
+  const slug = req.params.slug;
+
+  const post = await postQueries.getPostBySlug(slug);
+  if (!post) {
+    return next(new Errors.customError("Post not found", 404));
+  }
+
+  await postQueries.updatePostViews(post.id);
 
   res.json({
     success: true,
@@ -120,6 +137,7 @@ const createPost = [
     ]);
 
     const { title } = req.body;
+    const slug = slugify(title);
     let categoryNames = req.body.categoryNames;
 
     if (!categoryNames || categoryNames === "") {
@@ -142,6 +160,7 @@ const createPost = [
 
     const post = await postQueries.createPost(
       title,
+      slug,
       fileResult.secure_url,
       fileResult.public_id,
       thumbnailResult.secure_url,
@@ -235,6 +254,7 @@ const updatePost = [
 
     // update en la DB
     const { title } = req.body;
+    const slug = slugify(title);
     let categoryNames = req.body.categoryNames;
 
     if (!categoryNames || categoryNames === "") {
@@ -258,6 +278,7 @@ const updatePost = [
     await postQueries.updatePost(
       post.id,
       title,
+      slug,
       fileResult.public_id,
       fileResult.secure_url,
       thumbnailResult.public_id,
@@ -357,6 +378,7 @@ const postController = {
   updatePost,
   getSinglePost,
   updateLikePost,
+  getPostBySlug,
 };
 
 export default postController;

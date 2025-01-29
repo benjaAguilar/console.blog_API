@@ -9,7 +9,7 @@ const router = Router();
 
 router.get("/", tryCatch(postController.getPosts));
 
-router.get("/:postId", tryCatch(postController.getSinglePost));
+router.get("/:slug", tryCatch(postController.getPostBySlug));
 
 router.post(
   "/",

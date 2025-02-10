@@ -38,7 +38,11 @@ const getPosts = async () => {
         owner: true,
         comments: true,
         userLikes: true,
-        categories: true,
+        categories: {
+          include: {
+            category: true,
+          },
+        },
       },
     }),
   );

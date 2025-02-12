@@ -44,6 +44,9 @@ const getPosts = async () => {
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     }),
   );
 };
@@ -60,6 +63,7 @@ const getPostsByCategory = async (categoryId) => {
       },
       include: {
         userLikes: true,
+        comments: true,
         categories: {
           include: {
             category: true,

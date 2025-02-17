@@ -13,7 +13,7 @@ import categoryQueries from "../db/categoryQueries.js";
 import slugify from "slugify";
 
 async function getPosts(req, res) {
-  const { category } = req.query;
+  const { category, lang } = req.query;
   let categoryQuery;
   let posts;
 
@@ -24,7 +24,7 @@ async function getPosts(req, res) {
   if (categoryQuery) {
     posts = await postQueries.getPostsByCategory(categoryQuery.id);
   } else {
-    posts = await postQueries.getPosts();
+    posts = await postQueries.getPosts(lang);
   }
 
   res.json({
@@ -136,7 +136,7 @@ const createPost = [
       }),
     ]);
 
-    const { title } = req.body;
+    const { title, lang } = req.body;
     const slug = slugify(title);
     let categoryNames = req.body.categoryNames;
 
@@ -168,6 +168,7 @@ const createPost = [
       user.id,
       readTime,
       categories,
+      lang,
     );
 
     res.json({
@@ -253,7 +254,7 @@ const updatePost = [
     ]);
 
     // update en la DB
-    const { title } = req.body;
+    const { title, lang } = req.body;
     const slug = slugify(title);
     let categoryNames = req.body.categoryNames;
 
@@ -284,6 +285,7 @@ const updatePost = [
       thumbnailResult.public_id,
       thumbnailResult.secure_url,
       readTime,
+      lang,
     );
     await postQueries.deleteCategoriesRelations(post.id, categories);
     await postQueries.addNewCategoriesRelations(postId, categories);

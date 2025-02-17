@@ -11,6 +11,7 @@ const createPost = async (
   ownerId,
   readtime,
   categories,
+  lang,
 ) => {
   return tryQuery(() =>
     prisma.post.create({
@@ -26,14 +27,18 @@ const createPost = async (
         categories: {
           create: categories.map((categoryId) => ({ categoryId })),
         },
+        lang: lang,
       },
     }),
   );
 };
 
-const getPosts = async () => {
+const getPosts = async (lang) => {
   return tryQuery(() =>
     prisma.post.findMany({
+      where: {
+        lang: lang,
+      },
       include: {
         owner: true,
         comments: true,
@@ -131,6 +136,7 @@ const updatePost = async (
   thumbnailId,
   thumbnailUrl,
   readTime,
+  lang,
 ) => {
   return tryQuery(() =>
     prisma.post.update({
@@ -142,6 +148,7 @@ const updatePost = async (
         thumbnailId: thumbnailId,
         thumbnailUrl: thumbnailUrl,
         readtimeMin: readTime,
+        lang: lang,
       },
       where: {
         id: postId,

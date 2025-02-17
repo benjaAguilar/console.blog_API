@@ -22,7 +22,7 @@ async function getPosts(req, res) {
   }
 
   if (categoryQuery) {
-    posts = await postQueries.getPostsByCategory(categoryQuery.id);
+    posts = await postQueries.getPostsByCategory(categoryQuery.id, lang);
   } else {
     posts = await postQueries.getPosts(lang);
   }

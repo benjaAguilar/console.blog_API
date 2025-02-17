@@ -56,7 +56,7 @@ const getPosts = async (lang) => {
   );
 };
 
-const getPostsByCategory = async (categoryId) => {
+const getPostsByCategory = async (categoryId, lang) => {
   return tryQuery(() =>
     prisma.post.findMany({
       where: {
@@ -65,6 +65,7 @@ const getPostsByCategory = async (categoryId) => {
             categoryId: categoryId,
           },
         },
+        lang: lang,
       },
       include: {
         userLikes: true,

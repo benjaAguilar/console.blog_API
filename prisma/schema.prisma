@@ -30,6 +30,7 @@ model Post {
   readtimeMin  Int
   published    Boolean     @default(false)
   categories   PostCategory[]
+  lang         Lang         @default(ES)
 }
 
 model User {
@@ -93,4 +94,9 @@ model PostCategory {
 enum Role {
   ADMIN
   USER
+}
+
+enum Lang {
+  ES 
+  EN
 }

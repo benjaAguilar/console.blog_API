@@ -22,7 +22,7 @@ const createComment = [
     if (!validationErrors.isEmpty()) {
       return next(
         new Errors.validationError(
-          "Invalid field",
+          req.message.fail.invalidFields,
           400,
           validationErrors.array(),
         ),
@@ -35,7 +35,7 @@ const createComment = [
     const post = await postQueries.getPostById(postId);
 
     if (!post) {
-      return next(new Errors.customError("Post not found", 404));
+      return next(new Errors.customError(req.message.fail.postNotFound, 404));
     }
 
     const { content } = req.body;
@@ -47,7 +47,7 @@ const createComment = [
 
     res.json({
       success: true,
-      message: "Commented!",
+      message: req.message.success.createdComment,
       comment,
     });
   }),
@@ -60,15 +60,12 @@ async function deleteComment(req, res, next) {
   const comment = await commentQueries.getCommentById(commentId);
 
   if (!comment) {
-    return next(new Errors.customError("Comment not found", 404));
+    return next(new Errors.customError(req.message.fail.commentNotFound, 404));
   }
 
   if (comment.ownerId !== user.id && user.role !== "ADMIN") {
     return next(
-      new Errors.customError(
-        "You dont have permissions to delete this comment",
-        401,
-      ),
+      new Errors.customError(req.message.fail.unauthorizedToDeleteComment, 401),
     );
   }
 
@@ -76,7 +73,7 @@ async function deleteComment(req, res, next) {
 
   res.json({
     success: true,
-    message: "Comment Deleted!",
+    message: req.message.success.deletedComment,
     delComment,
   });
 }
@@ -88,7 +85,7 @@ const updateComment = [
     if (!validationErrors.isEmpty()) {
       return next(
         new Errors.validationError(
-          "Invalid field",
+          req.message.fail.invalidFields,
           400,
           validationErrors.array(),
         ),
@@ -101,15 +98,14 @@ const updateComment = [
     const comment = await commentQueries.getCommentById(commentId);
 
     if (!comment) {
-      return next(new Errors.customError("Comment not found", 404));
+      return next(
+        new Errors.customError(req.message.fail.commentNotFound, 404),
+      );
     }
 
     if (comment.ownerId !== user.id) {
       return next(
-        new Errors.customError(
-          "You dont have permissions to edit this comment",
-          401,
-        ),
+        new Errors.customError(req.message.fail.unauthorizedToEditComment, 401),
       );
     }
 
@@ -121,14 +117,14 @@ const updateComment = [
 
     res.json({
       success: true,
-      message: "Comment Updated!",
+      message: req.message.success.updatedComment,
       updatedComment,
     });
   }),
 ];
 
 async function updateLikeComment(req, res, next) {
-  let msg = "Liked!";
+  let msg = req.message.success.liked;
 
   const user = req.user;
   const commentId = parseInt(req.params.commentId);
@@ -139,14 +135,14 @@ async function updateLikeComment(req, res, next) {
   ]);
 
   if (!comment) {
-    return next(new Errors.customError("Comment not found", 404));
+    return next(new Errors.customError(req.message.fail.commentNotFound, 404));
   }
 
   if (!liked) {
     await commentQueries.like(commentId, user.id);
   } else {
     await commentQueries.dislike(commentId, user.id);
-    msg = "Disliked!";
+    msg = req.message.success.disliked;
   }
 
   res.json({

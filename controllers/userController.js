@@ -13,7 +13,7 @@ const registerUser = [
     if (!validationErrors.isEmpty()) {
       return next(
         new Errors.validationError(
-          "Invalid fields",
+          req.message.fail.invalidFields,
           400,
           validationErrors.array(),
         ),
@@ -26,7 +26,7 @@ const registerUser = [
       if (err) {
         res.status(500).json({
           status: 500,
-          errorMessage: "Internal Server error creating user",
+          errorMessage: req.message.fail.passwordHashError,
           hashError: err,
         });
         return;
@@ -36,7 +36,7 @@ const registerUser = [
       //responder con json
       res.json({
         success: true,
-        message: "User Created successfully",
+        message: req.message.success.createdUser,
       });
     });
   }),
@@ -50,7 +50,7 @@ const loginUser = [
     if (!validationErrors.isEmpty()) {
       return next(
         new Errors.validationError(
-          "Invalid fields",
+          req.message.fail.invalidFields,
           400,
           validationErrors.array(),
         ),
@@ -60,11 +60,15 @@ const loginUser = [
     const { username, password } = req.body;
     const user = await userQueries.getUserByName(username);
 
-    if (!user) return next(new Errors.customError("User not Found", 404));
+    if (!user)
+      return next(new Errors.customError(req.message.fail.userNotFound, 404));
 
     const match = await bcrypt.compare(password, user.password);
 
-    if (!match) return next(new Errors.customError("Incorrect Password", 400));
+    if (!match)
+      return next(
+        new Errors.customError(req.message.fail.incorrectPassword, 400),
+      );
 
     const tokenObject = createJWT(user);
 
@@ -77,7 +81,7 @@ const loginUser = [
 
     res.json({
       success: true,
-      message: `Successfully logged in as ${username}`,
+      message: `${req.message.success.loginUser} ${username}`,
     });
   }),
 ];
@@ -101,14 +105,14 @@ async function logoutUser(req, res, next) {
   const user = req.user;
 
   if (!user) {
-    return next(new Errors.customError("Error login out", 401));
+    return next(new Errors.customError(req.message.fail.logout, 401));
   }
 
   res.clearCookie("authToken");
 
   res.json({
     success: true,
-    message: "Logged out successfully!",
+    message: req.message.success.logoutUser,
   });
 }
 

@@ -33,7 +33,7 @@ async function errorHandler(err, req, res, next) {
 
   return res
     .status(500)
-    .json({ success: false, message: "Internal server Error" });
+    .json({ success: false, message: req.message.fail.internalServerError });
 }
 
 export default errorHandler;

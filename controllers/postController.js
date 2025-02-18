@@ -38,7 +38,7 @@ async function getSinglePost(req, res, next) {
 
   const post = await postQueries.getPostById(postId);
   if (!post) {
-    return next(new Errors.customError("Post not found", 404));
+    return next(new Errors.customError(req.message.fail.postNotFound, 404));
   }
 
   await postQueries.updatePostViews(postId);
@@ -54,7 +54,7 @@ async function getPostBySlug(req, res, next) {
 
   const post = await postQueries.getPostBySlug(slug);
   if (!post) {
-    return next(new Errors.customError("Post not found", 404));
+    return next(new Errors.customError(req.message.fail.postNotFound, 404));
   }
 
   await postQueries.updatePostViews(post.id);
@@ -72,7 +72,7 @@ const createPost = [
     if (!validationErrors.isEmpty()) {
       return next(
         new Errors.validationError(
-          "Invalid field",
+          req.message.fail.invalidFields,
           400,
           validationErrors.array(),
         ),
@@ -82,10 +82,7 @@ const createPost = [
     const user = req.user;
     if (user.role !== "ADMIN") {
       return next(
-        new Errors.customError(
-          "You dont have permissions to create a post",
-          401,
-        ),
+        new Errors.customError(req.message.fail.unauthorizedToCreatePost, 401),
       );
     }
 
@@ -96,7 +93,9 @@ const createPost = [
       : null;
 
     if (!file) {
-      return next(new Errors.customError("File not provided", 400));
+      return next(
+        new Errors.customError(req.message.fail.fileNotProvided, 400),
+      );
     }
 
     const filePath = saveMD(file);
@@ -108,7 +107,7 @@ const createPost = [
         deleteLocalUploads(filePath);
         if (thumbnailImage) deleteLocalUploads(thumbnailPath);
         return next(
-          new Errors.customError("Thumbnail provided has to be an image", 400),
+          new Errors.customError(req.message.fail.thumbnailBadFile, 400),
         );
       }
     }
@@ -117,7 +116,7 @@ const createPost = [
       deleteLocalUploads(filePath);
       if (thumbnailImage) deleteLocalUploads(thumbnailPath);
       return next(
-        new Errors.customError("File provided has to be a markdown", 400),
+        new Errors.customError(req.message.fail.markdownBadFile, 400),
       );
     }
 
@@ -173,7 +172,7 @@ const createPost = [
 
     res.json({
       success: true,
-      message: "Post Created!",
+      message: req.message.success.createdPost,
       post,
     });
   }),
@@ -186,7 +185,7 @@ const updatePost = [
     if (!validationErrors.isEmpty()) {
       return next(
         new Errors.validationError(
-          "Invalid field",
+          req.message.fail.invalidFields,
           400,
           validationErrors.array(),
         ),
@@ -196,17 +195,15 @@ const updatePost = [
     const user = req.user;
     if (user.role !== "ADMIN") {
       return next(
-        new Errors.customError(
-          "You dont have permissions to update a post",
-          401,
-        ),
+        new Errors.customError(req.message.fail.unauthorizedToEditPost, 401),
       );
     }
 
     const postId = parseInt(req.params.postId);
 
     const post = await postQueries.getPostById(postId);
-    if (!post) return next(new Errors.customError("Post not found", 404));
+    if (!post)
+      return next(new Errors.customError(req.message.fail.postNotFound, 404));
 
     const file = req.files["post"] ? req.files["post"][0] : null;
     const thumbnailImage = req.files["thumbnail"]
@@ -214,7 +211,9 @@ const updatePost = [
       : null;
 
     if (!file) {
-      return next(new Errors.customError("File not provided", 400));
+      return next(
+        new Errors.customError(req.message.fail.fileNotProvided, 400),
+      );
     }
 
     const filePath = saveMD(file);
@@ -226,7 +225,7 @@ const updatePost = [
         deleteLocalUploads(filePath);
         if (thumbnailImage) deleteLocalUploads(thumbnailPath);
         return next(
-          new Errors.customError("Thumbnail provided has to be an image", 400),
+          new Errors.customError(req.message.fail.thumbnailBadFile, 400),
         );
       }
     }
@@ -234,7 +233,7 @@ const updatePost = [
     if (file.mimetype !== "text/markdown") {
       deleteLocalUploads(filePath);
       return next(
-        new Errors.customError("File provided has to be a markdown", 400),
+        new Errors.customError(req.message.fail.markdownBadFile, 400),
       );
     }
 
@@ -306,7 +305,7 @@ const updatePost = [
 
     res.json({
       success: true,
-      message: `Post ${title} Successfully updated!`,
+      message: `${req.message.success.updatedPost} ${title}`,
     });
   }),
 ];
@@ -315,7 +314,7 @@ async function deletePost(req, res, next) {
   const user = req.user;
   if (user.role !== "ADMIN") {
     return next(
-      new Errors.customError("You dont have permissions to delete a post", 401),
+      new Errors.customError(req.message.fail.unauthorizedToDeletePost, 401),
     );
   }
 
@@ -324,7 +323,8 @@ async function deletePost(req, res, next) {
   // obtener la data del post a eliminar
   const post = await postQueries.getPostById(postId);
 
-  if (!post) return next(new Errors.customError("Post not found", 404));
+  if (!post)
+    return next(new Errors.customError(req.message.fail.postNotFound, 404));
 
   // eliminar archivo alojado en cloudinary
   if (post.thumbnailId) {
@@ -341,12 +341,12 @@ async function deletePost(req, res, next) {
 
   res.json({
     success: true,
-    message: `Post: ${post.title} successfully deleted!`,
+    message: `${req.message.success.deletedPost} ${post.title}`,
   });
 }
 
 async function updateLikePost(req, res, next) {
-  let msg = "Liked!";
+  let msg = req.message.success.liked;
 
   const user = req.user;
   const postId = parseInt(req.params.postId);
@@ -357,14 +357,14 @@ async function updateLikePost(req, res, next) {
   ]);
 
   if (!post) {
-    return next(new Errors.customError("Post not found", 404));
+    return next(new Errors.customError(req.message.fail.postNotFound, 404));
   }
 
   if (!liked) {
     await postQueries.like(postId, user.id);
   } else {
     await postQueries.dislike(postId, user.id);
-    msg = "Disliked!";
+    msg = req.message.success.disliked;
   }
 
   res.json({

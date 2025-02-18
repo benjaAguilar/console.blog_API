@@ -1,0 +1,72 @@
+{
+  "es": {
+    "success": {
+      "createdComment": "Comentado!",
+      "deletedComment": "Comentario eliminado!",
+      "updatedComment": "Comentario actualizado!",
+      "liked": "Like agregado!",
+      "disliked": "Like removido!",
+      "createdPost": "Post creado!",
+      "updatedPost": "Post actualizado correctamente:",
+      "deletedPost": "Post eliminado correctamente:",
+      "createdUser": "Usuario creado satisfactoriamente",
+      "loginUser": "Iniciado sesion satisfactoriamente como",
+      "logoutUser": "Sesion cerrada satisfactoriamente!"
+    },
+    "fail": {
+      "invalidFields": "Campos invalidos",
+      "postNotFound": "Post no encontrado",
+      "commentNotFound": "Comentario no encontrado",
+      "unauthorizedToDeleteComment": "No tienes permisos para eliminar este comentario",
+      "unauthorizedToEditComment": "No tienes permisos para actualizar este comentario",
+      "unauthorizedToCreatePost": "No tienes permisos para crear un post",
+      "unauthorizedToUpdatePost": "No tienes permisos para editar este post",
+      "unauthorizedToDeletePost": "No tienes permisos para eliminar este post",
+      "fileNotProvided": "Archivo no proporcionado",
+      "thumbnailBadFile": "La miniatura proporcionada tiene que ser una imagen",
+      "markdownBadFile": "El archivo proporcionado tiene que ser un markdown",
+      "passwordHashError": "Error interno del servidor creando el usuario",
+      "userNotFound": "Usuario no encontrado",
+      "incorrectPassword": "Contraseña incorrecta",
+      "registerUser": "Registra un usuario",
+      "logout": "Error cerrando la sesion",
+      "internalServerError": "Error interno en el servidor",
+      "dbError": "Ups! Hubo un problema en la base de datos"
+    }
+  },
+  "en": {
+    "success": {
+      "createdComment": "Commented!",
+      "deletedComment": "Comment deleted!",
+      "updatedComment": "Comment updated!",
+      "liked": "Liked!",
+      "disliked": "Disliked!",
+      "createdPost": "Post created!",
+      "updatedPost": "Successfully updated post:",
+      "deletedPost": "Successfully deleted post:",
+      "createdUser": "User Created successfully",
+      "loginUser": "Successfully logged in as",
+      "logoutUser": "Logged out successfully!"
+    },
+    "fail": {
+      "invalidFields": "Invalid fields",
+      "postNotFound": "Post not found",
+      "commentNotFound": "Comment not found",
+      "unauthorizedToDeleteComment": "You dont have permissions to delete this comment",
+      "unauthorizedToEditComment": "You dont have permissions to update this comment",
+      "unauthorizedToCreatePost": "You dont have permissions to create a post",
+      "unauthorizedToUpdatePost": "You dont have permissions to update a post",
+      "unauthorizedToDeletePost": "You dont have permissions to delete a post",
+      "fileNotProvided": "File not provided",
+      "thumbnailBadFile": "Thumbnail provided has to be an image",
+      "markdownBadFile": "File provided has to be a markdown",
+      "passwordHashError": "Internal server error creating user",
+      "userNotFound": "User not found",
+      "incorrectPassword": "Incorrect Password",
+      "registerUser": "Register a user",
+      "logout": "Error login out",
+      "internalServerError": "Internal server error",
+      "dbError": "Oops! There was a problem on the database"
+    }
+  }
+}

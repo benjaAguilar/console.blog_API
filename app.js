@@ -11,6 +11,7 @@ import userRoutes from "./routes/userRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 import categoryRoutes from "./routes/categoriesRoutes.js";
 import cookieParser from "cookie-parser";
+import messages from "./config/messages.json" with { type: "json" };
 
 const app = express();
 
@@ -23,6 +24,13 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(process.cwd(), "public")));
+
+// lang middleware
+app.use((req, res, next) => {
+  const lang = req.cookies["lang"] || "en";
+  req.message = messages[lang];
+  next();
+});
 
 configurePassport(passport);
 app.use(passport.initialize());

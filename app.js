@@ -17,7 +17,7 @@ const app = express();
 
 dotenv.config();
 
-const whiteList = ["http://localhost:4321"];
+const whiteList = [process.env.WHITELIST_CLIENT, process.env.WHITELIST_ADMIN];
 
 app.use(cors({ origin: whiteList, credentials: true }));
 app.use(cookieParser());

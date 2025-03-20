@@ -82,6 +82,7 @@ const loginUser = [
     res.json({
       success: true,
       message: `${req.message.success.loginUser} ${username}`,
+      user,
     });
   }),
 ];

@@ -109,7 +109,11 @@ async function logoutUser(req, res, next) {
     return next(new Errors.customError(req.message.fail.logout, 401));
   }
 
-  res.clearCookie("authToken");
+  res.clearCookie("authToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "none",
+  });
 
   res.json({
     success: true,
